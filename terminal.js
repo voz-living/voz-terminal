@@ -88,6 +88,11 @@ class VozlivingTerminal {
         border: {
           fg: '#ffffff',
         },
+        focus: {
+          border: {
+            fg: 'red',
+          }
+        }
       },
     });
 
@@ -110,6 +115,11 @@ class VozlivingTerminal {
         border: {
           fg: '#ffffff',
         },
+        focus: {
+          border: {
+            fg: 'red',
+          }
+        }
       },
     });
 
@@ -138,6 +148,11 @@ class VozlivingTerminal {
         border: {
           fg: '#ffffff',
         },
+        focus: {
+          border: {
+            fg: 'red',
+          }
+        }
       },
     });
 
