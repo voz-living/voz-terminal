@@ -1,0 +1,21 @@
+{
+  "name": "vozliving-terminal",
+  "version": "1.0.0",
+  "description": "another vozliving client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "voz",
+    "terminal"
+  ],
+  "author": "sonnn",
+  "license": "ISC",
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "cheerio-without-node-native": "^0.20.2",
+    "lodash": "^4.17.4",
+    "node-fetch": "^1.7.1"
+  }
+}
