@@ -2,7 +2,7 @@
 terminal client for voz
 
 # Install
-`npm install`
+`npm install` \n
 require node 7
 
 # Done
