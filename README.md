@@ -1,6 +1,8 @@
 # voz-terminal
 terminal client for voz
 
+![alt text](https://github.com/sonnn/voz-terminal/blob/master/demo.png)
+
 # Install
 `npm install`
 
