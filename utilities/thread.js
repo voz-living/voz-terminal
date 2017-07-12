@@ -43,10 +43,6 @@ async function getThreadList(id, pageNum = 0) {
     const response = await GET(url);
     return [parseThreadList(response), parsePageNum(response)];
   } catch (error) {
-    console.log({
-      message: 'Can not get thread list!',
-      error,
-    });
     return [[], 0];
   }
 }

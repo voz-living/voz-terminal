@@ -94,10 +94,6 @@ function parsePost($post, threadId) {
 
     return post;
   } catch (error) {
-    // console.log({
-    //   message: 'Can not parse post!',
-    //   error: error.toString(),
-    // });
     return null;
   }  
 }
@@ -152,11 +148,7 @@ async function getPostList(tid, pageNum = 0) {
     const response = await GET(url);
     return [parsePosts(tid, response), parsePageNum(response), parseUser(response), parseSecurityToken(response)];
   } catch (error) {
-    console.log({
-      message: 'Can not get posts!',
-      error: error.toString(),
-    });
-    return [[], 0];
+    return [[], 0, {}, ''];
   }
 }
 

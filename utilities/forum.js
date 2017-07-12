@@ -28,10 +28,6 @@ async function getForumList() {
     const response = await GET(FORUM_URL);
     return parseForums(response).concat(HIDDEN_FORUMS);
   } catch (error) {
-    console.log({
-      message: 'Can not get forum list!',
-      error: error.toString(),
-    });
     return [];
   }
 }

@@ -9,7 +9,8 @@ class VozlivingTerminal {
     this.threads = [];
     this.posts = [];
     this.currentFocus = 'forum';
-    this.postIndexViewing = 0;
+    this.currentPostIndex = 0;
+    this.currentThreadPageNum = 0;
 
     this.screen = blessed.screen({
       autopadding: true,
@@ -34,14 +35,14 @@ class VozlivingTerminal {
 
     this.screen.key(['left', 'right'], (ch, key) => {
       if (this.currentFocus === 'post') {
-        let newIndex = this.postIndexViewing;
+        let newIndex = this.currentPostIndex;
         if (key.name === 'right') {
           newIndex += 1;
         } else {
           if (newIndex > 0) newIndex -= 1;
         }
         if (this.posts[newIndex]) {
-          this.postIndexViewing = newIndex;
+          this.currentPostIndex = newIndex;
           this.setPost(this.posts[newIndex]);
         }
       }
@@ -74,7 +75,7 @@ class VozlivingTerminal {
 
     this.contentBottom = blessed.box({
       width: '90%',
-      height: '50%',
+      height: '45%',
       top: '50%',
       left: '5%',
       label: 'Post',
@@ -167,20 +168,16 @@ class VozlivingTerminal {
     const user = blessed.box({
       width: '100%',
       height: '15%',
-      top: '15%',
+      top: '10%',
       content: `${post.user.name.trim()}`,
     });
 
-    const lineWidth = ~~(masterWidth / 10 * 9);
-    const lines = post.content.text.match(new RegExp(`.{1,${lineWidth}}`, 'g'));
-
-    const content = blessed.list({
+    const content = blessed.box({
       width: '100%',
-      height: '70%',
-      top: '30%',
+      height: '80%',
+      top: '20%',
+      content: post.content.text
     });
-
-    content.setItems(lines);
 
     postContainer.append(content);
     postContainer.append(user);
@@ -197,6 +194,7 @@ class VozlivingTerminal {
   async loadPosts(id, page) {
     const [posts, pageNum, user, securityCode] = await getPostList(id, page);
     this.posts = posts;
+    this.currentThreadPageNum = pageNum;
     this.setPost(this.posts[0]);
   }
 
