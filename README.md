@@ -6,6 +6,9 @@ terminal client for voz
 
 require node 7
 
+# Run
+`node .`
+
 # Done
 [x] load forums (not hidden or children forums)
 
