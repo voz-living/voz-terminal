@@ -11,6 +11,7 @@ class VozlivingTerminal {
     this.currentFocus = 'forum';
     this.currentPostIndex = 0;
     this.currentThreadPageNum = 0;
+    this.currentPost = null;
 
     this.screen = blessed.screen({
       autopadding: true,
@@ -158,7 +159,7 @@ class VozlivingTerminal {
     this.currentFocus = 'thread';
   }
 
-  makePostBox(post, masterWidth) {
+  makePostBox(post) {
     const postContainer = blessed.box({
       width: '90%',
       left: '5%',
@@ -185,20 +186,25 @@ class VozlivingTerminal {
   }
 
   setPost(post) {
-    this.contentBottom.setContent("");
     this.contentBottom.focus();
-    this.contentBottom.append(this.makePostBox(post, this.contentBottom.width));
+    this.currentPost = this.makePostBox(post);
+    this.contentBottom.append(this.currentPost);
     this.update();
   }
 
   async loadPosts(id, page) {
+    if (this.currentPost) this.contentBottom.remove(this.currentPost);
+    this.contentBottom.setContent('Loading posts...');
     const [posts, pageNum, user, securityCode] = await getPostList(id, page);
     this.posts = posts;
     this.currentThreadPageNum = pageNum;
+    this.contentBottom.setContent('');
     this.setPost(this.posts[0]);
   }
 
   async loadThreads(id, page) {
+    if (this.currentPost) this.contentBottom.remove(this.currentPost);
+    this.threadList.setItems(['Loading threads...']);
     const [threads, pageNum] = await getThreadList(id, page);
     this.threads = threads;
     this.threadList.setItems(this.threads.map(t => {
