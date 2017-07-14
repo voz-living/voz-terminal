@@ -20,7 +20,7 @@ class VozlivingTerminal {
       fullUnicode: true,
     });
 
-    this.screen.key(['q', 'C-c'], () => process.exit(0));
+    this.screen.key(['q', 'C-c'], () => process.exit(0)); // eslint-disable-line no-process-exit
     
     this.screen.key(['escape'], () => {
       if (this.currentFocus !== 'forum') {
@@ -210,7 +210,7 @@ class VozlivingTerminal {
   async loadPosts(id, page) {
     if (this.currentPost) this.contentBottom.remove(this.currentPost);
     this.contentBottom.setContent('Loading posts...');
-    const [posts, pageNum, user, securityCode] = await getPostList(id, page);
+    const [posts, pageNum, /*user */, /* securityCode */] = await getPostList(id, page);
     this.posts = posts;
     this.currentThreadPageNum = pageNum;
     this.contentBottom.setContent('');
@@ -220,7 +220,7 @@ class VozlivingTerminal {
   async loadThreads(id, page) {
     if (this.currentPost) this.contentBottom.remove(this.currentPost);
     this.threadList.setItems(['Loading threads...']);
-    const [threads, pageNum] = await getThreadList(id, page);
+    const [threads, /* pageNum */] = await getThreadList(id, page);
     this.threads = threads;
     this.threadList.setItems(this.threads.map(t => {
       return `${t.id} - ${t.title}`;
