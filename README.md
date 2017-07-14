@@ -14,7 +14,7 @@ require node 7
 # Done
 [x] load forums (not hidden or children forums)
 
-[x] load thead of forum
+[x] load thread of forum
 
 [x] load 10 first post
 
@@ -26,3 +26,10 @@ require node 7
 [ ] command switch focus like `/switch forum`
 
 [ ] go to thread by id `/goto thread ${id}`
+
+[ ] quick navigation by searching (forums, threads)
+
+[ ] subs-forums support (+hidden)
+
+[ ] login, post reply, create new thread
+
