@@ -4,12 +4,12 @@ terminal client for voz
 ![alt text](https://github.com/sonnn/voz-terminal/blob/master/demo.png)
 
 # Install
-`npm install`
-
 require node 7
 
+`npm install`
+
 # Run
-`node .`
+`npm start`
 
 # Done
 [x] load forums (not hidden or children forums)
