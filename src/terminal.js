@@ -3,12 +3,15 @@ const { getForumList } = require('./utilities/forum');
 const { getThreadList } = require('./utilities/thread');
 const { getPostList } = require('./utilities/post');
 
+const styles = require('./styles');
+const { PANEL } = require('./consts');
+
 class VozlivingTerminal {
   constructor() {
     this.forums = [];
     this.threads = [];
     this.posts = [];
-    this.currentFocus = 'forum';
+    this.currentFocus = PANEL.FORUM;
     this.currentPostIndex = 0;
     this.currentThreadPageNum = 0;
     this.currentPost = null;
@@ -23,19 +26,19 @@ class VozlivingTerminal {
     this.screen.key(['q', 'C-c'], () => process.exit(0)); // eslint-disable-line no-process-exit
     
     this.screen.key(['escape'], () => {
-      if (this.currentFocus !== 'forum') {
-        if (this.currentFocus === 'thread') {
-          this.currentFocus = 'forum';
+      if (this.currentFocus !== PANEL.FORUM) {
+        if (this.currentFocus === PANEL.THREAD) {
+          this.currentFocus = PANEL.FORUM;
         }
-        if (this.currentFocus === 'post') {
-          this.currentFocus = 'thread';
+        if (this.currentFocus === PANEL.POST) {
+          this.currentFocus = PANEL.THREAD;
         }
         this.update();
       }
     });
 
     this.screen.key(['left', 'right'], (ch, key) => {
-      if (this.currentFocus === 'post') {
+      if (this.currentFocus === PANEL.POST) {
         let newIndex = this.currentPostIndex;
         if (key.name === 'right') {
           newIndex += 1;
@@ -49,79 +52,16 @@ class VozlivingTerminal {
       }
     });
 
-    this.container = blessed.box({
-      width: '100%',
-      height: '100%',
-      style: {
-        fg: '#bbb',
-        bg: '#1d1f21',
-      },
-    });
-
-    this.sideBar = blessed.box({
-      width: '30%',
-      height: '100%',
-    });
-
-    this.contentBox = blessed.box({
-      width: '70%',
-      height: '100%',
-      left: '30%',
-    });
-
-    this.contentTop = blessed.box({
-      width: '100%',
-      height: '50%',
-    });
-
-    this.contentBottom = blessed.box({
-      width: '90%',
-      height: '45%',
-      top: '50%',
-      left: '5%',
-      label: 'Post',
-      scrollable: true,
-      border: {
-        type: 'line',
-      },
-      style: {
-        border: {
-          fg: '#ffffff',
-        },
-        focus: {
-          border: {
-            fg: 'red',
-          }
-        }
-      },
-    });
-
-    this.forumList = blessed.list({
-      width: '90%',
-      height: '90%',
-      left: '5%',
-      top: '5%',
+    this.container = blessed.box(styles.container);
+    this.sideBar = blessed.box(styles.sideBar);
+    this.contentBox = blessed.box(styles.contentBox);
+    this.contentTop = blessed.box(styles.contentTop);
+    this.contentBottom = blessed.box(styles.contentBottom)
+    this.forumList = blessed.list(Object.assign({}, styles.forumList, {
       keys: true,
       tags: true,
       label: 'Forums',
-      border: {
-        type: 'line',
-      },
-      style: {
-        selected: {
-          bg: '#373b41',
-          fg: '#c5c8c6',
-        },
-        border: {
-          fg: '#ffffff',
-        },
-        focus: {
-          border: {
-            fg: 'red',
-          }
-        }
-      },
-    });
+    }));
 
     this.forumList.on('select', (data) => {
       const forumName = data.content;
@@ -129,32 +69,11 @@ class VozlivingTerminal {
       this.update();
     });
 
-    this.threadList = blessed.list({
-      width: '90%',
-      height: '90%',
-      left: '5%',
-      top: '10%',
+    this.threadList = blessed.list(Object.assign({}, styles.threadList, {
       keys: true,
       tags: true,
       label: 'Threads',
-      border: {
-        type: 'line',
-      },
-      style: {
-        selected: {
-          bg: '#373b41',
-          fg: '#c5c8c6',
-        },
-        border: {
-          fg: '#ffffff',
-        },
-        focus: {
-          border: {
-            fg: 'red',
-          }
-        }
-      },
-    });
+    }));
 
     this.threadList.on('select', (data) => {
       const threadId = data.content.split(' - ')[0];
@@ -165,13 +84,13 @@ class VozlivingTerminal {
 
   onThreadListClick(threadId) {
     this.loadPosts(threadId, 0);
-    this.currentFocus = 'post';
+    this.currentFocus = PANEL.POST;
   }
 
   onForumListClick(forumName) {
     const found = this.forums.find(f => f.title == forumName);
     this.loadThreads(found.id, 0);
-    this.currentFocus = 'thread';
+    this.currentFocus = PANEL.THREAD;
   }
 
   makePostBox(post) {
@@ -239,10 +158,10 @@ class VozlivingTerminal {
 
   update() {
     switch (this.currentFocus) {
-      case 'post':
+      case PANEL.POST:
         this.contentBottom.focus();
         break;
-      case 'thread':
+      case PANEL.THREAD:
         this.threadList.focus();
         break;
       default:
