@@ -1,9 +1,9 @@
 # voz-terminal
 terminal client for voz
 
-[Imgur](http://i.imgur.com/iSgviQc.png)
-[Imgur](http://i.imgur.com/Qe1rkny.png)
-[Imgur](http://i.imgur.com/rKcf5vQ.png)
+![Imgur](http://i.imgur.com/iSgviQc.png)
+![Imgur](http://i.imgur.com/Qe1rkny.png)
+![Imgur](http://i.imgur.com/rKcf5vQ.png)
 
 # Install
 require node 7
