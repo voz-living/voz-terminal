@@ -1,7 +1,9 @@
 # voz-terminal
 terminal client for voz
 
-![alt text](https://github.com/sonnn/voz-terminal/blob/master/demo.png)
+[Imgur](http://i.imgur.com/iSgviQc.png)
+[Imgur](http://i.imgur.com/Qe1rkny.png)
+[Imgur](http://i.imgur.com/rKcf5vQ.png)
 
 # Install
 require node 7
@@ -11,11 +13,12 @@ require node 7
 # Run
 `npm start`
 
+# Dev
+`npm run dev`
+
 # Done
 [x] load forums (not hidden or children forums)
-
-[x] load thread of forum
-
+[x] load threads of forum
 [x] load 10 first post
 
 # TO DO
