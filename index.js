@@ -1,4 +1,2 @@
-const VozlivingTerminal = require('./src/terminal');
-const termninal = new VozlivingTerminal();
-
-termninal.init();
+const { init } = require('./src/terminal');
+init();

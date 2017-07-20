@@ -3,6 +3,7 @@
     "extends": ["eslint:recommended", "plugin:node/recommended"],
     "rules": {
         "node/exports-style": ["error", "module.exports"],
-        "node/no-unsupported-features": ["error", { "version": 7, "ignores": ["asyncAwait"]}]
+        "node/no-unsupported-features": ["error", { "version": 7, "ignores": ["asyncAwait"]}],
+        "no-console": 0
     }
 }

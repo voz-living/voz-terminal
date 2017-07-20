@@ -1,188 +1,131 @@
+require('./log').replaceDefaultLog();
 const blessed = require('blessed');
-const { getForumList } = require('./utilities/forum');
-const { getThreadList } = require('./utilities/thread');
-const { getPostList } = require('./utilities/post');
+const { VIEW } = require('./consts');
+const viewForums = require('./views/forums');
+const viewThreads = require('./views/threads');
+const viewPosts = require('./views/posts');
+console.log(`terminal@${new Date().getTime()}`);
+let _screen;
 
-const styles = require('./styles');
-const { PANEL } = require('./consts');
+function prepareScreen() {
+  const scr = blessed.screen({
+    autopadding: true,
+    smartCSR: true,
+    title: 'Voz Living Termninal',
+    fullUnicode: true,
+  });
+  scr.key(['C-c'], () => process.exit(0)); // eslint-disable-line no-process-exit
+  scr.key(['escape'], navigateBack); // eslint-disable-line no-process-exit
+  scr.render();
+  return scr;
+}
+const defaultViewData = { type: VIEW.FORUMLIST };
+let _viewData = {};
 
-class VozlivingTerminal {
-  constructor() {
-    this.forums = [];
-    this.threads = [];
-    this.posts = [];
-    this.currentFocus = PANEL.FORUM;
-    this.currentPostIndex = 0;
-    this.currentThreadPageNum = 0;
-    this.currentPost = null;
+const setViewData = (data) => _viewData = data;
+const getViewData = (data) => _viewData;
 
-    this.screen = blessed.screen({
-      autopadding: true,
-      smartCSR: true,
-      title: 'Vozliving termninal',
-      fullUnicode: true,
-    });
-
-    this.screen.key(['q', 'C-c'], () => process.exit(0)); // eslint-disable-line no-process-exit
-    
-    this.screen.key(['escape'], () => {
-      if (this.currentFocus !== PANEL.FORUM) {
-        if (this.currentFocus === PANEL.THREAD) {
-          this.currentFocus = PANEL.FORUM;
-        }
-        if (this.currentFocus === PANEL.POST) {
-          this.currentFocus = PANEL.THREAD;
-        }
-        this.update();
-      }
-    });
-
-    this.screen.key(['left', 'right'], (ch, key) => {
-      if (this.currentFocus === PANEL.POST) {
-        let newIndex = this.currentPostIndex;
-        if (key.name === 'right') {
-          newIndex += 1;
-        } else {
-          if (newIndex > 0) newIndex -= 1;
-        }
-        if (this.posts[newIndex]) {
-          this.currentPostIndex = newIndex;
-          this.setPost(this.posts[newIndex]);
-        }
-      }
-    });
-
-    this.container = blessed.box(styles.container);
-    this.sideBar = blessed.box(styles.sideBar);
-    this.contentBox = blessed.box(styles.contentBox);
-    this.contentTop = blessed.box(styles.contentTop);
-    this.contentBottom = blessed.box(styles.contentBottom)
-    this.forumList = blessed.list(Object.assign({}, styles.forumList, {
-      keys: true,
-      tags: true,
-      label: 'Forums',
-    }));
-
-    this.forumList.on('select', (data) => {
-      const forumName = data.content;
-      this.onForumListClick(forumName);
-      this.update();
-    });
-
-    this.threadList = blessed.list(Object.assign({}, styles.threadList, {
-      keys: true,
-      tags: true,
-      label: 'Threads',
-    }));
-
-    this.threadList.on('select', (data) => {
-      const threadId = data.content.split(' - ')[0];
-      this.onThreadListClick(threadId);
-      this.update();
-    });
-  }
-
-  onThreadListClick(threadId) {
-    this.loadPosts(threadId, 0);
-    this.currentFocus = PANEL.POST;
-  }
-
-  onForumListClick(forumName) {
-    const found = this.forums.find(f => f.title == forumName);
-    this.loadThreads(found.id, 0);
-    this.currentFocus = PANEL.THREAD;
-  }
-
-  makePostBox(post) {
-    const postContainer = blessed.box({
-      width: '90%',
-      left: '5%',
-      height: '100%',
-    });
-
-    const user = blessed.box({
-      width: '100%',
-      height: '15%',
-      top: '10%',
-      content: `${post.user.name.trim()}`,
-    });
-
-    const content = blessed.box({
-      width: '100%',
-      height: '80%',
-      top: '20%',
-      content: post.content.text
-    });
-
-    postContainer.append(content);
-    postContainer.append(user);
-    return postContainer;
-  }
-
-  setPost(post) {
-    this.contentBottom.focus();
-    this.currentPost = this.makePostBox(post);
-    this.contentBottom.append(this.currentPost);
-    this.update();
-  }
-
-  async loadPosts(id, page) {
-    if (this.currentPost) this.contentBottom.remove(this.currentPost);
-    this.contentBottom.setContent('Loading posts...');
-    const [posts, pageNum, /*user */, /* securityCode */] = await getPostList(id, page);
-    this.posts = posts;
-    this.currentThreadPageNum = pageNum;
-    this.contentBottom.setContent('');
-    this.setPost(this.posts[0]);
-  }
-
-  async loadThreads(id, page) {
-    if (this.currentPost) this.contentBottom.remove(this.currentPost);
-    this.threadList.setItems(['Loading threads...']);
-    const [threads, /* pageNum */] = await getThreadList(id, page);
-    this.threads = threads;
-    this.threadList.setItems(this.threads.map(t => {
-      return `${t.id} - ${t.title}`;
-    }));
-    this.threadList.focus();
-    this.update();
-  }
-
-  async loadForums() {
-    this.forums = await getForumList();
-    this.forumList.deleteTop();
-    this.forumList.setItems(this.forums.map(forum => forum.title));
-    this.forumList.focus();
-    this.update();
-  }
-
-  update() {
-    switch (this.currentFocus) {
-      case PANEL.POST:
-        this.contentBottom.focus();
-        break;
-      case PANEL.THREAD:
-        this.threadList.focus();
-        break;
-      default:
-        this.forumList.focus();
-        break;
-    }
-    this.screen.render();
-  }
-
-  init() {
-    this.forumList.setItems(['Loading forum list...']);
-    this.sideBar.append(this.forumList);
-    this.contentTop.append(this.threadList);
-    this.contentBox.append(this.contentTop);
-    this.contentBox.append(this.contentBottom);
-    this.container.append(this.sideBar);
-    this.container.append(this.contentBox);
-    this.screen.append(this.container);
-    this.screen.render();
-    this.loadForums();
+const forumListEvt = {
+  forumSelect: (forum) => {
+    if (forum.isGroupEntry === true) return;
+    changeView({ type: VIEW.FORUM, forum, lastView: getViewData()})
   }
 }
 
-module.exports = VozlivingTerminal;
+const threadsEvt = {
+  threadSelect: (post) => {
+    changeView({ type: VIEW.THREAD, post, lastView: getViewData()});
+  }
+}
+
+const postsEvt = {
+  postSelect: (post) => {
+    console.log(post);
+  }
+}
+function changeView(container, screen, view) {
+  let v;
+  if (view.type == VIEW.FORUMLIST) {
+    v = viewForums.renderView({ on: forumListEvt });
+  } else if (view.type === VIEW.FORUM) {
+    v = viewThreads.renderView({ on: threadsEvt, forum: view.forum });
+  } else if (view.type === VIEW.THREAD) {
+    v = viewPosts.renderView({ on: postsEvt, post: view.post, screen });
+  } else {
+    throw new Error(`Invalid view ${view.type}`);
+  }
+  container.children.forEach(c => container.remove(c));
+  container.append(v);
+  screen.render();
+  setViewData(view);
+}
+
+function navigateBack() {
+  const state = getViewData();
+  if (state.lastView) {
+    changeView(state.lastView);
+  } else {
+    console.log('No back')
+  }
+}
+
+function drawWrapper({ screen }) {
+  const ctn = blessed.box({
+    width: '100%',
+    height: '100%',
+    style: {
+      fg: '#bbb',
+      bg: '#1d1f21',
+    }
+  })
+  const text = blessed.text({
+    content: 'Voz Living Terminal',
+    left: 0,
+    top: 0,
+    width: '100%',
+    height: 3,
+    border: 'line',
+    padding: { left: 1, top: 0, right: 1, bottom: 0},
+    fg: 'white'
+  });
+  const content = blessed.box({
+    width: '100%',
+    height: '100%-3',
+    top: 3,
+    left: 0,
+    // border: 'line'
+  })
+  ctn.append(text);
+  ctn.append(content);
+  screen.append(ctn);
+  screen.render();
+  return content;
+}
+
+function init(viewData = defaultViewData) {
+  try {
+    const screen = prepareScreen();
+    setViewData(viewData);
+    const container = drawWrapper({ screen });
+    changeView = changeView.bind(null, container, screen)
+    changeView(viewData);
+    _screen = screen;
+    return { screen };
+  } catch (e) {
+    console.log(e.stack)
+  }
+}
+
+function detach() {
+  if(_screen && _screen.destroy) {
+    _screen.destroy();
+    return true;
+  }
+  return false;
+}
+
+module.exports = {
+  init,
+  detach,
+  getViewData,
+}

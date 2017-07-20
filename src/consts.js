@@ -1,5 +1,6 @@
 module.exports = {
-  PANEL: {
+  VIEW: {
+    FORUMLIST: 'FORUMLIST',
     FORUM: 'FORUM',
     THREAD: 'THREAD',
     POST: 'POST',

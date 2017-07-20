@@ -46,14 +46,24 @@ const contentBottom = {
 }
 
 const forumList = {
-  width: '90%',
-  height: '90%',
-  left: '5%',
-  top: '5%',
   border: {
     type: 'line',
   },
+  align: 'left',
+  pad: 3,
   style: {
+    header: {
+      fg: 'blue',
+      bold: true,
+      align: 'left',
+    },
+    cell: {
+      fg: 'magenta',
+      selected: {
+        bg: 'blue'
+      },
+      align: 'left'
+    },
     selected: {
       bg: '#373b41',
       fg: '#c5c8c6',

@@ -10,6 +10,7 @@ function patchProtocal(url) {
 
 function requestFactory(requestOption = {}) {
   return (url, additionOption = {}) => new Promise((resolve, reject) => {
+    console.log(url);
     const options = _.assign({}, requestOption, additionOption);
     fetch(patchProtocal(url), options).then((response) => {
       if (options.jsonOutput === true) {
